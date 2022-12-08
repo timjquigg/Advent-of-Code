@@ -5,7 +5,8 @@ const day = 7;
 const cookie = process.env.COOKIE;
 
 class FileSystem {
-  constructor(name, type = 'dir', size = 0) {
+  constructor(id, name, type = 'dir', size = 0) {
+    this.id = id;
     this.name = name;
     this.size = size;
     this.type = type;
@@ -54,78 +55,42 @@ class FileSystem {
     return subs;
   }
 
-  print() {
-    let children = '';
-    for (const child of this.children) {
-      children += `name: ${child.name}, size: ${child.size}\n\t`;
-    }
-    const string = `
-    name: ${this.name}
-    type: ${this.type}
-    parent: ${this.parent ? this.parent.name : null}
-    children: 
-        ${children}
-    `;
-    console.log(string);
-  }
-
 }
 
 const buildTree = (input) => {
-  const directories = [new FileSystem('/')];
-  const history = [];
-  let parent;
+  const fileTree = {0: new FileSystem(0,'/')};
+  let currentDir = fileTree[0];
 
   for (const i in input) {
     const line = input[i].split(' ');
-    // console.log(line);
-    if (line[0] === '$') {
-      
-      if (line[1] === 'cd') {
-        
-        if (line[2] === '..') {
-          history.pop();
-          
-        } else {
-          history.push(line[2]);
-          
-        }
-        parent = history.slice(-1)[0];
-      }
-      
-    }
     
     if (line[0] === 'dir') {
-      directories.push(new FileSystem(line[1]));
-      const possibleParents = directories.filter(el => {
-        return el.name === parent;
-      });
-      const thisParent = possibleParents.slice(-1)[0];
-      thisParent.addChild(directories.slice(-1)[0]);
+      fileTree[i] = new FileSystem(i, line[1]);
+      currentDir.addChild(fileTree[i]);
     }
     
     if (line[0].match(/\d+/)) {
-      directories.push(new FileSystem(line[1], 'file', Number(line[0])));
-      const possibleParents = directories.filter(el => {
-        return el.name === parent;
-      });
-      const thisParent = possibleParents.slice(-1)[0];
-      thisParent.addChild(directories.slice(-1)[0]);
+      fileTree[i] = new FileSystem(i, line[1], 'file', Number(line[0]));
+      currentDir.addChild(fileTree[i]);
     }
-    // console.log({history});
-    // console.log({parent});
+    
+    if (line[1] === 'cd') {
+      if (line[2] === '..') {
+        const newCurrent = currentDir.parent;
+        currentDir = newCurrent;
+
+      } else if (line[2] === '/') {
+        continue;
+
+      } else {
+        const newCurrent = currentDir.children.find(child => child.name === line[2]);
+        currentDir = newCurrent;
+      }
+
+    }
   }
-
-  const tree = directories[0].printTree();
-  console.log(tree);
-
-  const dirs = directories.filter(el => el.type === 'dir');
-
-  const children = dirs.map(el => {
-    console.log(el.name);
-    return el.getChildFiles();
-  });
-  console.log(children);
+  
+  return fileTree;
 };
 
 getInput(day, cookie)
@@ -133,31 +98,46 @@ getInput(day, cookie)
 
     // Parsing Data
     const input = response.data.split('\n').slice(0,-1);
-    //     const input =
-    // `$ cd /
-    // $ ls
-    // dir a
-    // 14848514 b.txt
-    // 8504156 c.dat
-    // dir d
-    // $ cd a
-    // $ ls
-    // dir e
-    // 29116 f
-    // 2557 g
-    // 62596 h.lst
-    // $ cd e
-    // $ ls
-    // 584 i
-    // $ cd ..
-    // $ cd ..
-    // $ cd d
-    // $ ls
-    // 4060174 j
-    // 8033020 d.log
-    // 5626152 d.ext
-    // 7214296 k`.split('\n');
-   
     // console.log(input);
-    buildTree(input);
+
+    // Build Tree:
+    const fileTree = buildTree(input);
+
+    // Get only directories:
+    const directories = Object.values(fileTree).filter(el => el.type === 'dir');
+    console.log(`Total size of tree is ${Object.keys(fileTree).length} items`);
+    console.log(`Total number of directories is ${directories.length}`);
+
+    const sizes = directories.map(el => el.getSize());
+    const totalSize = directories[0].getSize();
+    console.log(`Total size on disk of root directory: ${totalSize}`);
+
+    // Part #1:
+    const smallSizes = sizes.filter(el => el <= 100000);
+    const totalSmallSizes = smallSizes.reduce((prev, curr) => {
+      return prev + curr;
+    },0);
+    console.log(`Total small directory size: ${totalSmallSizes}`);
+
+    // Part #2
+    const diskSize = 70000000;
+    const updateSize = 30000000;
+    
+    const currentFreeSpace = diskSize - totalSize;
+    const difference = updateSize - currentFreeSpace;
+
+    console.log(`
+      Total disk size         = ${diskSize}
+      Update size             = ${updateSize}
+      Free space available    = ${currentFreeSpace}
+      Additional space needed = ${difference}
+    `);
+
+    sizes.sort((a,b) => a - b);
+
+    const firstBigger = sizes.findIndex(el => el >= difference);
+    const newDifference = sizes[firstBigger] + currentFreeSpace;
+
+    console.log(`Smallest directory large enough to meet space requirements is ${sizes[firstBigger]}. Removing that directory yields ${newDifference} space on disk.`);
+
   });
