@@ -1,9 +1,3 @@
-require('dotenv').config();
-const {getInput} = require('./getInput');
-
-const day = 8;
-const cookie = process.env.COOKIE;
-
 const transpose = (matrix) => {
   
   const transposed = [];
@@ -72,16 +66,14 @@ const solution = (input) => {
 
 };
 
+const runtest = (input) => {
 
-getInput(day, cookie)
-  .then((response) => {
+  input = input.split('\n').slice(0,-1);
+  
+  const [visible, maxScore] = solution(input);
 
-    // Parsing Data
-    const input = response.data.split('\n').slice(0,-1);
-    // const input = ['30373', '25512', '65332', '33549', '35390'];
+  console.log({visible});
+  console.log({maxScore});
+};
 
-    const [visible, maxScore] = solution(input);
-
-    console.log({visible});
-    console.log({maxScore});
-  });
+module.exports = {runtest};

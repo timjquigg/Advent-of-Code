@@ -11,6 +11,22 @@ This is my first attempt at [Advent of Code](https://adventofcode.com/) and I wa
 * Axios
 * dotenv
 
-Install dependencies with `npm install`
+Install dependencies with
+
+`npm install`
+
+Your solution for each day should be in a file in the [/answers](/answers) foler. Files are named: **day_X.js** where **X** denotes the day number.
+
+There is a template file for future days in the [/answers](/answers) folder. Copies can be created using the npm script
+
+`npm run copy --day`
+
+where `--day` refers to the new day file you would like to create.
 
 Create a .env file that contains your cookie used by your browser when logged into the Advent of Code website.
+
+To run your tests, simply use 
+
+`npm run day --day` 
+
+where `--day` denotes the day you would like to run.

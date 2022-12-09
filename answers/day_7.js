@@ -1,9 +1,3 @@
-require('dotenv').config();
-const {getInput} = require('./getInput');
-
-const day = 7;
-const cookie = process.env.COOKIE;
-
 class FileSystem {
   constructor(id, name, type = 'dir', size = 0) {
     this.id = id;
@@ -93,51 +87,53 @@ const buildTree = (input) => {
   return fileTree;
 };
 
-getInput(day, cookie)
-  .then((response) => {
+const runtest = (input) => {
 
-    // Parsing Data
-    const input = response.data.split('\n').slice(0,-1);
-    // console.log(input);
+  // Parsing Data
+  input = input.split('\n').slice(0,-1);
+  // console.log(input);
+  
+  // Build Tree:
+  const fileTree = buildTree(input);
+  
+  // Get only directories:
+  const directories = Object.values(fileTree).filter(el => el.type === 'dir');
+  console.log(`Total size of tree is ${Object.keys(fileTree).length} items`);
+  console.log(`Total number of directories is ${directories.length}`);
+  
+  const sizes = directories.map(el => el.getSize());
+  const totalSize = directories[0].getSize();
+  console.log(`Total size on disk of root directory: ${totalSize}`);
+  
+  // Part #1:
+  const smallSizes = sizes.filter(el => el <= 100000);
+  const totalSmallSizes = smallSizes.reduce((prev, curr) => {
+    return prev + curr;
+  },0);
+  console.log(`Total small directory size: ${totalSmallSizes}`);
+  
+  // Part #2
+  const diskSize = 70000000;
+  const updateSize = 30000000;
+  
+  const currentFreeSpace = diskSize - totalSize;
+  const difference = updateSize - currentFreeSpace;
+  
+  console.log(`
+    Total disk size         = ${diskSize}
+    Update size             = ${updateSize}
+    Free space available    = ${currentFreeSpace}
+    Additional space needed = ${difference}
+  `);
+  
+  sizes.sort((a,b) => a - b);
+  
+  const firstBigger = sizes.findIndex(el => el >= difference);
+  const newDifference = sizes[firstBigger] + currentFreeSpace;
+  
+  console.log(`Smallest directory large enough to meet space requirements is ${sizes[firstBigger]}. Removing that directory yields ${newDifference} space on disk.`);
+  
+};
 
-    // Build Tree:
-    const fileTree = buildTree(input);
+module.exports = {runtest};
 
-    // Get only directories:
-    const directories = Object.values(fileTree).filter(el => el.type === 'dir');
-    console.log(`Total size of tree is ${Object.keys(fileTree).length} items`);
-    console.log(`Total number of directories is ${directories.length}`);
-
-    const sizes = directories.map(el => el.getSize());
-    const totalSize = directories[0].getSize();
-    console.log(`Total size on disk of root directory: ${totalSize}`);
-
-    // Part #1:
-    const smallSizes = sizes.filter(el => el <= 100000);
-    const totalSmallSizes = smallSizes.reduce((prev, curr) => {
-      return prev + curr;
-    },0);
-    console.log(`Total small directory size: ${totalSmallSizes}`);
-
-    // Part #2
-    const diskSize = 70000000;
-    const updateSize = 30000000;
-    
-    const currentFreeSpace = diskSize - totalSize;
-    const difference = updateSize - currentFreeSpace;
-
-    console.log(`
-      Total disk size         = ${diskSize}
-      Update size             = ${updateSize}
-      Free space available    = ${currentFreeSpace}
-      Additional space needed = ${difference}
-    `);
-
-    sizes.sort((a,b) => a - b);
-
-    const firstBigger = sizes.findIndex(el => el >= difference);
-    const newDifference = sizes[firstBigger] + currentFreeSpace;
-
-    console.log(`Smallest directory large enough to meet space requirements is ${sizes[firstBigger]}. Removing that directory yields ${newDifference} space on disk.`);
-
-  });
