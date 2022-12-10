@@ -42,7 +42,7 @@ const runCPU = (input) => {
     }
     x += instruction[1] ? Number(instruction[1]) : 0;
   }
-  
+   
   return [signalStrength, screen];
 };
 
