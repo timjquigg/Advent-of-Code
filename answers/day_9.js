@@ -83,7 +83,6 @@ const getUnique = (positions) => {
     uniqueObj[stringified] = currentPosition;
   }
 
-
   const results = Object.values(uniqueObj);
 
   return results;
