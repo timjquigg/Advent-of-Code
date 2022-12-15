@@ -8,15 +8,17 @@ const {runtest} = require(`./answers/day_${day}.js`);
 const cookie = process.env.COOKIE;
 
 fs.readFile(`./input/day_${day}.txt`, {encoding: 'utf8'})
+  // If input file exists, run from file
   .then(data => {
     runtest(data);
   })
+  // If input file does not exist, download it
   .catch(() => {
-    console.log(`Input file does nto exist for day ${day}. Downloading now......`);
+    console.log(`Input file does not exist for day ${day}.\nDownloading now...................`);
     getInput(day, cookie)
+      // Once input is downloaded, save to file then run test
       .then((response) => {
         const input = response.data;
-        // runtest(input);
         fs.writeFile(`./input/day_${day}.txt`, input)
           .then(()=> {
             runtest(input);
