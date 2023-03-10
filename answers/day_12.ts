@@ -1,46 +1,46 @@
-const buildGraph = (input) => {
+const buildGraph = (input: string[]) => {
   const graph = {};
   const start = [];
   const finish = [];
   for (let i = 0; i < input.length; i++) {
     for (let j = 0; j < input[i].length; j++) {
-      const position = JSON.stringify([i,j]);
+      const position = JSON.stringify([i, j]);
       graph[position] = {};
       const adjacents = [];
       let currentValue = input[i][j].charCodeAt(0);
 
-      if (input[i][j] === 'S') {
-        start.push(i,j);
+      if (input[i][j] === "S") {
+        start.push(i, j);
         currentValue = 97;
       }
 
-      if (input[i][j] === 'E') {
-        finish.push(i,j);
+      if (input[i][j] === "E") {
+        finish.push(i, j);
         currentValue = 122;
       }
 
       if (i > 0) {
-        adjacents.push([input[i - 1][j], [i - 1,j]]);
+        adjacents.push([input[i - 1][j], [i - 1, j]]);
       }
-      
+
       if (j < input[i].length - 1) {
-        adjacents.push([input[i][j + 1], [i,j + 1]]);
+        adjacents.push([input[i][j + 1], [i, j + 1]]);
       }
-      
-      if (i < (input.length - 1)) {
-        adjacents.push([input[i + 1][j], [i + 1,j]]);
-        
+
+      if (i < input.length - 1) {
+        adjacents.push([input[i + 1][j], [i + 1, j]]);
       }
-      
+
       if (j > 0) {
         adjacents.push([input[i][j - 1], [i, j - 1]]);
-        
       }
-      adjacents.filter(el => {
-        return (Math.abs(el[0].charCodeAt(0) - currentValue) <= 1);
-      }).forEach(el => {
-        graph[position][JSON.stringify(el[1])] = 1;
-      });
+      adjacents
+        .filter((el) => {
+          return Math.abs(el[0].charCodeAt(0) - currentValue) <= 1;
+        })
+        .forEach((el) => {
+          graph[position][JSON.stringify(el[1])] = 1;
+        });
     }
   }
   console.log(graph, start, finish);
@@ -51,13 +51,13 @@ const buildGraph = (input) => {
 const shortestDistanceNode = (distances, visited) => {
   // create a default value for shortest
   let shortest = null;
-	
+
   // for each node in the distances object
   for (let node in distances) {
     // if no node has been assigned to shortest yet
     // or if the current node's distance is smaller than the current shortest
     let currentIsShortest =
-			shortest === null || distances[node] < distances[shortest];
+      shortest === null || distances[node] < distances[shortest];
     // and if the current node is in the unvisited set
     if (currentIsShortest && !visited.includes(node)) {
       // update shortest to be the current node
@@ -84,14 +84,13 @@ const findShortestPath = (graph, startNode, endNode) => {
   let node = shortestDistanceNode(distances, visited);
   // for that node:
   while (node) {
-  // find its distance from the start node & its child nodes
+    // find its distance from the start node & its child nodes
     let distance = distances[node];
     let children = graph[node];
     // console.log({node});
     // console.log(graph[node]);
     // for each of those child nodes:
     for (let child in children) {
-      
       // make sure each child node is not the start node
       if (String(child) === String(startNode)) {
         continue;
@@ -113,14 +112,13 @@ const findShortestPath = (graph, startNode, endNode) => {
           parents[child] = node;
         }
       }
-      
     }
     // move the current node to the visited set
     visited.push(node);
     // move to the nearest neighbor node
     node = shortestDistanceNode(distances, visited);
   }
-   
+
   // using the stored paths from start node to end node
   // record the shortest path
   let shortestPath = [endNode];
@@ -141,8 +139,8 @@ const findShortestPath = (graph, startNode, endNode) => {
   return results;
 };
 
-const runtest = (input) => {
-/*
+export const runtest = (inputStr: string) => {
+  /*
   input = `
 Sabqponm
 abcryxxl
@@ -151,12 +149,13 @@ acctuvwj
 abdefghi
 `.split('\n').slice(1,-1).map(el => el.split(''));
  */
-  input = input.split('\n').slice(0, -1).map(el => el.split(''));
+  const input = inputStr
+    .split("\n")
+    .slice(0, -1)
+    .map((el) => el.split(""));
   console.log(input);
   // buildGraph(input);
   const [graph, startNode, endNode] = buildGraph(input);
   const results = findShortestPath(graph, startNode, endNode);
   console.log(results);
 };
-
-module.exports = {runtest};
