@@ -21,7 +21,7 @@ const compareArrays = (arr1, arr2) => {
     return false;
   }
 
-  if (typeof flat1[0] === 'undefined' && typeof flat2[0] === 'undefined') {
+  if (typeof flat1[0] === "undefined" && typeof flat2[0] === "undefined") {
     if (JSON.stringify(arr1).length > JSON.stringify(arr2).length) {
       return false;
     }
@@ -30,8 +30,8 @@ const compareArrays = (arr1, arr2) => {
   return true;
 };
 
-const runtest = (input) => {
-/*
+export const runtest = (inputStr: string) => {
+  /*
   input = `
 [1,1,3,1,1]
 [1,1,5,1,1]
@@ -57,9 +57,13 @@ const runtest = (input) => {
 [1,[2,[3,[4,[5,6,7]]]],8,9]
 [1,[2,[3,[4,[5,6,0]]]],8,9]`;
  */
-  console.log(input);
+  console.log(inputStr);
   // input = input.split('\n\n').map(el => el.split('\n'));
-  input = input.trim().split('\n\n').map(el => el.split('\n')).map(el => JSON.parse("[" + el + "]"));
+  const input = inputStr
+    .trim()
+    .split("\n\n")
+    .map((el) => el.split("\n"))
+    .map((el) => JSON.parse("[" + el + "]"));
   console.log(input);
   const inOrder = [];
   input.filter((el, i) => {
@@ -71,5 +75,3 @@ const runtest = (input) => {
 
   console.log(sum);
 };
-
-module.exports = {runtest};

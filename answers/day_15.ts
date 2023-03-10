@@ -1,7 +1,3 @@
-const runtest = (input) => {
-
+export const runtest = (inputStr: string) => {
   // Code goes here
-  
 };
-
-module.exports = {runtest};
