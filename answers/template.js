@@ -1,7 +1,7 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.runtest = void 0;
 const runtest = (input) => {
-
-  // Code goes here
-  
+    // Code goes here
 };
-
-module.exports = {runtest};
+exports.runtest = runtest;
